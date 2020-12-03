@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "theater", "theater.vcxproj", "{4EC1D679-02F1-4E58-9FC3-846705FF36DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EC1D679-02F1-4E58-9FC3-846705FF36DF}.Debug|x64.ActiveCfg = Debug|x64
+		{4EC1D679-02F1-4E58-9FC3-846705FF36DF}.Debug|x64.Build.0 = Debug|x64
+		{4EC1D679-02F1-4E58-9FC3-846705FF36DF}.Release|x64.ActiveCfg = Release|x64
+		{4EC1D679-02F1-4E58-9FC3-846705FF36DF}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {960CF3B7-611A-477E-9FAB-4B2035837F16}
+	EndGlobalSection
+EndGlobal

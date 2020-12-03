@@ -10,3 +10,4 @@ Utility to dim all screens when focusing on some applications, especially useful
 - UI: Support customizing the fade in/out animations
 - CONFIG: Add support for YAML or JSON based config files
 - OPTIM: Cache window handles / process IDs in some ways with their associated process?
+- Add support for custom color

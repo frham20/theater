@@ -5,12 +5,14 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="theater.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="dimmer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tray.cpp" />
     <ClCompile Include="app.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="theater.cpp" />
+    <ClCompile Include="dimmer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

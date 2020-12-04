@@ -12,7 +12,7 @@ static UINT_PTR s_timerID = 0;
 static std::chrono::high_resolution_clock::time_point s_timerStart;
 static std::vector<HWND> s_topLevelWindows;
 static HWINEVENTHOOK s_winEventHook = nullptr;
-static std::unordered_set<std::wstring> s_processNameSet = {L"chrome", L"notepad", L"calculator"}; //tests
+static std::unordered_set<std::wstring> s_processNameSet = {L"chrome", L"notepad"}; //tests
 
 
 static BOOL CALLBACK App_EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
@@ -78,7 +78,7 @@ static LRESULT CALLBACK App_MessageWindowProc(HWND hWnd, UINT message, WPARAM wP
 			s_timerID = 0;
 		}
 
-		const float alpha = std::min(1.0f, elapsedMs / 500.0f);
+		const float alpha = 0.8f * std::min(1.0f, elapsedMs / 500.0f);
 		Dimmer_SetAlpha(alpha);
 		break;
 	}

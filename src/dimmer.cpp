@@ -13,6 +13,7 @@ struct MonitorInstance
 };
 
 static std::vector<MonitorInstance> s_monitors;
+static COLORREF s_clearColor = RGB(0, 0, 50);
 
 static BOOL Dimmer_EnumMonitorsProc(HMONITOR handle, HDC dc, LPRECT rc, LPARAM lParam)
 {
@@ -25,6 +26,27 @@ static BOOL Dimmer_EnumMonitorsProc(HMONITOR handle, HDC dc, LPRECT rc, LPARAM l
 
 static LRESULT CALLBACK Dimmer_WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	switch (message)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		HDC dc = ::BeginPaint(hWnd, &ps);
+
+		const COLORREF oldDCBrushColor = ::SetDCBrushColor(dc, s_clearColor);
+		::FillRect(dc, &ps.rcPaint, static_cast<HBRUSH>(::GetStockObject(DC_BRUSH)));
+		::SetDCBrushColor(dc, oldDCBrushColor);
+
+		::EndPaint(hWnd, &ps);
+
+		return 0;
+	}
+	case WM_ERASEBKGND:
+	{
+		return TRUE;
+	}
+	}
+
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
@@ -46,7 +68,7 @@ static bool Dimmer_WindowsCreate()
 	wcex.hInstance = hInstance;
 	wcex.hIcon = ::LoadIcon(hInstance, MAKEINTRESOURCE(IDI_THEATER));
 	wcex.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
+	wcex.hbrBackground = nullptr; // static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = DIMMER_WINDOWCLASS_NAME;
 	wcex.hIconSm = nullptr;
@@ -97,8 +119,19 @@ void Dimmer_SetAlpha(float alpha)
 
 void Dimmer_SetColor(float r, float g, float b)
 {
-	//TODO
-	//Need to handle WM_PAINT and WM_ERASEBKG
+	const BYTE r256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(r * 255.0f + 0.5f)));
+	const BYTE g256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(g * 255.0f + 0.5f)));
+	const BYTE b256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(b * 255.0f + 0.5f)));
+
+	s_clearColor = RGB(r256, g256, b256);
+
+	for (const auto& monitor : s_monitors)
+	{
+		if (!::IsWindowVisible(monitor.hwnd))
+			continue;
+		
+		::InvalidateRect(monitor.hwnd, nullptr, FALSE);
+	}
 }
 
 void Dimmer_Close()

@@ -118,6 +118,10 @@ static void App_MessageWindowDestroy()
 
 static void App_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
+	UNREFERENCED_PARAMETER(hWinEventHook);
+	UNREFERENCED_PARAMETER(dwmsEventTime);
+	UNREFERENCED_PARAMETER(idEventThread);
+
 	switch (event)
 	{
 	case EVENT_SYSTEM_FOREGROUND:
@@ -146,7 +150,7 @@ static void App_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd
 		wchar_t filename[_MAX_FNAME];
 		_wsplitpath_s(processPath, nullptr, 0, nullptr, 0, filename, _MAX_FNAME, nullptr, 0);
 		filename[_MAX_FNAME - 1] = 0;
-		std::transform(std::begin(filename), std::end(filename), std::begin(filename), [](wchar_t c) -> wchar_t { return std::tolower(c); });
+		std::transform(std::begin(filename), std::end(filename), std::begin(filename), [](wchar_t c) -> wchar_t { return static_cast<wchar_t>(std::tolower(c)); });
 
 		if (s_processNameSet.find(filename) != s_processNameSet.cend())
 		{
@@ -184,6 +188,8 @@ static void App_HookUnregister()
 
 bool App_Init()
 {
+	Settings_Load();
+
 	if (!Tray_Init())
 		return false;
 	
@@ -213,6 +219,8 @@ int App_Run()
 
 void App_Close()
 {
+	Settings_Save();
+
 	App_HookUnregister();
 	App_MessageWindowDestroy();
 	Dimmer_Close();

@@ -8,6 +8,7 @@
 #include <windowsx.h>
 #include <combaseapi.h>
 #include <shellapi.h>
+#include <shlobj.h>
 
 //STL
 #include <algorithm>
@@ -17,5 +18,6 @@
 #include <vector>
 
 //App
+#include "settings.h"
 #include "tray.h"
 #include "app.h"

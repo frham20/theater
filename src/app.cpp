@@ -78,7 +78,7 @@ static LRESULT CALLBACK App_MessageWindowProc(HWND hWnd, UINT message, WPARAM wP
 			s_timerID = 0;
 		}
 
-		const float alpha = 0.8f * std::min(1.0f, elapsedMs / 500.0f);
+		const float alpha = (Settings_GetAlpha() / 255.0f) * std::min(1.0f, elapsedMs / 500.0f);
 		Dimmer_SetAlpha(alpha);
 		break;
 	}
@@ -190,16 +190,6 @@ bool App_Init()
 {
 	Settings_Load();
 
-	//setup the process name set
-	const wchar_t* processNames[256] = {};
-	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
-	for (size_t i = 0; i < processNameCount; i++)
-	{
-		std::wstring name(processNames[i]);
-		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
-		s_processNameSet.insert(std::move(name));
-	}
-
 	if (!Tray_Init())
 		return false;
 	
@@ -211,6 +201,18 @@ bool App_Init()
 
 	if (!App_HookRegister())
 		return false;
+
+	//Apply settings
+	const wchar_t* processNames[256] = {};
+	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
+	for (size_t i = 0; i < processNameCount; i++)
+	{
+		std::wstring name(processNames[i]);
+		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
+		s_processNameSet.insert(std::move(name));
+	}
+
+	Dimmer_SetColor(Settings_GetColor());
 
 	return true;
 }

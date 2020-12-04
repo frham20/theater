@@ -12,7 +12,7 @@ static UINT_PTR s_timerID = 0;
 static std::chrono::high_resolution_clock::time_point s_timerStart;
 static std::vector<HWND> s_topLevelWindows;
 static HWINEVENTHOOK s_winEventHook = nullptr;
-static std::unordered_set<std::wstring> s_processNameSet = {L"chrome", L"notepad"}; //tests
+static std::unordered_set<std::wstring> s_processNameSet;
 
 
 static BOOL CALLBACK App_EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
@@ -118,6 +118,10 @@ static void App_MessageWindowDestroy()
 
 static void App_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
+	UNREFERENCED_PARAMETER(hWinEventHook);
+	UNREFERENCED_PARAMETER(dwmsEventTime);
+	UNREFERENCED_PARAMETER(idEventThread);
+
 	switch (event)
 	{
 	case EVENT_SYSTEM_FOREGROUND:
@@ -146,7 +150,7 @@ static void App_WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd
 		wchar_t filename[_MAX_FNAME];
 		_wsplitpath_s(processPath, nullptr, 0, nullptr, 0, filename, _MAX_FNAME, nullptr, 0);
 		filename[_MAX_FNAME - 1] = 0;
-		std::transform(std::begin(filename), std::end(filename), std::begin(filename), [](wchar_t c) -> wchar_t { return std::tolower(c); });
+		std::transform(std::begin(filename), std::end(filename), std::begin(filename), [](wchar_t c) -> wchar_t { return static_cast<wchar_t>(std::tolower(c)); });
 
 		if (s_processNameSet.find(filename) != s_processNameSet.cend())
 		{
@@ -184,6 +188,18 @@ static void App_HookUnregister()
 
 bool App_Init()
 {
+	Settings_Load();
+
+	//setup the process name set
+	const wchar_t* processNames[256] = {};
+	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
+	for (size_t i = 0; i < processNameCount; i++)
+	{
+		std::wstring name(processNames[i]);
+		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
+		s_processNameSet.insert(std::move(name));
+	}
+
 	if (!Tray_Init())
 		return false;
 	
@@ -213,6 +229,8 @@ int App_Run()
 
 void App_Close()
 {
+	Settings_Save();
+
 	App_HookUnregister();
 	App_MessageWindowDestroy();
 	Dimmer_Close();

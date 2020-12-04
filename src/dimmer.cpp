@@ -17,6 +17,9 @@ static COLORREF s_clearColor = RGB(0, 0, 50);
 
 static BOOL Dimmer_EnumMonitorsProc(HMONITOR handle, HDC dc, LPRECT rc, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(dc);
+	UNREFERENCED_PARAMETER(lParam);
+
 	MonitorInstance monitor = {};
 	monitor.handle = handle;
 	monitor.rc = *rc;

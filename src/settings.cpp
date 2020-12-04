@@ -12,7 +12,6 @@ static constexpr int SETTINGS_VERSION = 1;
 struct Settings
 {
 	bool dirty = false;
-	int version = SETTINGS_VERSION;
 	bool enabled = true;
 	std::vector<std::wstring> processNames;
 };
@@ -56,7 +55,57 @@ static const wchar_t* Settings_GetSettingsFilename()
 
 bool Settings_Load()
 {
+	const auto filename = Settings_GetSettingsFilename();
+	if (::GetFileAttributesW(filename) == INVALID_FILE_ATTRIBUTES)
+		return false;
+
+	FILE* fp = nullptr;
+	_wfopen_s(&fp, filename, L"rb");
+	if (fp == nullptr)
+		return false;
+
+	rapidjson::FileReadStream inStream(fp, s_jsonReadWriteBuffer, sizeof(s_jsonReadWriteBuffer));
+	
+	JSONDocument doc;
+	doc.ParseStream<rapidjson::kParseDefaultFlags, rapidjson::UTF8<>, rapidjson::FileReadStream>(inStream);
+	fclose(fp);
+
+	if (doc.HasParseError())
+		return false;
+
+	int version = 0;
+	const auto& versionVal = doc[L"version"];
+	if (versionVal.IsInt())
+		version = versionVal.GetInt();
+
+	switch (version)
+	{
+	case SETTINGS_VERSION:
+	{
+		const auto& enabledVal = doc[L"enabled"];
+		if (enabledVal.IsBool())
+			s_settings.enabled = enabledVal.GetBool();
+
+		const auto& processes = doc[L"processes"];
+		if (processes.IsArray())
+		{
+			s_settings.processNames.clear();
+
+			for (const auto& name : processes.GetArray())
+				s_settings.processNames.emplace_back(std::wstring(name.GetString()));
+		}
+
+		break;
+	}
+	default:
+	{
+		//unsupported version, bail out
+		return false;
+	}
+	}
+
 	s_settings.dirty = false;
+
 	return true;
 }
 
@@ -71,7 +120,7 @@ bool Settings_Save()
 
 	auto& docAllocator = doc.GetAllocator();
 
-	doc.AddMember(L"version", JSONValue(s_settings.version), docAllocator);
+	doc.AddMember(L"version", JSONValue(SETTINGS_VERSION), docAllocator);
 	doc.AddMember(L"enabled", JSONValue(s_settings.enabled), docAllocator);
 
 	JSONValue processNames(rapidjson::kArrayType);

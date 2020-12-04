@@ -12,7 +12,7 @@ static UINT_PTR s_timerID = 0;
 static std::chrono::high_resolution_clock::time_point s_timerStart;
 static std::vector<HWND> s_topLevelWindows;
 static HWINEVENTHOOK s_winEventHook = nullptr;
-static std::unordered_set<std::wstring> s_processNameSet = {L"chrome", L"notepad"}; //tests
+static std::unordered_set<std::wstring> s_processNameSet;
 
 
 static BOOL CALLBACK App_EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
@@ -189,6 +189,16 @@ static void App_HookUnregister()
 bool App_Init()
 {
 	Settings_Load();
+
+	//setup the process name set
+	const wchar_t* processNames[256] = {};
+	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
+	for (size_t i = 0; i < processNameCount; i++)
+	{
+		std::wstring name(processNames[i]);
+		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
+		s_processNameSet.insert(std::move(name));
+	}
 
 	if (!Tray_Init())
 		return false;

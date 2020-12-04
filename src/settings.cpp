@@ -14,6 +14,8 @@ struct Settings
 	bool dirty = false;
 	bool enabled = true;
 	std::vector<std::wstring> processNames;
+	BYTE alpha = 200;
+	COLORREF color = RGB(0, 0, 0);
 };
 
 static Settings s_settings;
@@ -86,6 +88,27 @@ bool Settings_Load()
 		if (enabledVal.IsBool())
 			s_settings.enabled = enabledVal.GetBool();
 
+		const auto& alphaVal = doc[L"alpha"];
+		if (alphaVal.IsInt())
+			s_settings.alpha = static_cast<BYTE>(std::max(0, std::min(255, alphaVal.GetInt())));
+
+		const auto& color = doc[L"color"];
+		if (color.IsArray() && color.Size() == 3)
+		{
+			BYTE r = 0;
+			BYTE g = 0;
+			BYTE b = 0;
+
+			if (color[0].IsInt())
+				r = static_cast<BYTE>(std::max(0, std::min(255, color[0].GetInt())));
+			if (color[1].IsInt())
+				g = static_cast<BYTE>(std::max(0, std::min(255, color[1].GetInt())));
+			if (color[2].IsInt())
+				b = static_cast<BYTE>(std::max(0, std::min(255, color[2].GetInt())));
+			
+			s_settings.color = RGB(r, g, b);
+		}
+
 		const auto& processes = doc[L"processes"];
 		if (processes.IsArray())
 		{
@@ -122,6 +145,14 @@ bool Settings_Save()
 
 	doc.AddMember(L"version", JSONValue(SETTINGS_VERSION), docAllocator);
 	doc.AddMember(L"enabled", JSONValue(s_settings.enabled), docAllocator);
+	doc.AddMember(L"alpha", JSONValue(static_cast<int>(s_settings.alpha)), docAllocator);
+
+	JSONValue color(rapidjson::kArrayType);
+	color.Reserve(3, docAllocator);
+	color.PushBack(JSONValue(GetRValue(s_settings.color)), docAllocator);
+	color.PushBack(JSONValue(GetGValue(s_settings.color)), docAllocator);
+	color.PushBack(JSONValue(GetBValue(s_settings.color)), docAllocator);
+	doc.AddMember(L"color", color, docAllocator);
 
 	JSONValue processNames(rapidjson::kArrayType);
 	processNames.Reserve(static_cast<rapidjson::SizeType>(s_settings.processNames.size()), docAllocator);
@@ -187,4 +218,14 @@ void Settings_RemoveProcessName(const wchar_t* processName)
 
 	s_settings.processNames.erase(iter);
 	s_settings.dirty = true;
+}
+
+BYTE Settings_GetAlpha()
+{
+	return s_settings.alpha;
+}
+
+COLORREF Settings_GetColor()
+{
+	return s_settings.color;
 }

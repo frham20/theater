@@ -13,7 +13,7 @@ struct MonitorInstance
 };
 
 static std::vector<MonitorInstance> s_monitors;
-static COLORREF s_clearColor = RGB(0, 0, 50);
+static COLORREF s_clearColor = RGB(0, 0, 0);
 
 static BOOL Dimmer_EnumMonitorsProc(HMONITOR handle, HDC dc, LPRECT rc, LPARAM lParam)
 {
@@ -120,21 +120,25 @@ void Dimmer_SetAlpha(float alpha)
 		::SetLayeredWindowAttributes(monitor.hwnd, 0, alpha256, LWA_ALPHA);
 }
 
-void Dimmer_SetColor(float r, float g, float b)
+void Dimmer_SetColor(COLORREF rgb)
 {
-	const BYTE r256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(r * 255.0f + 0.5f)));
-	const BYTE g256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(g * 255.0f + 0.5f)));
-	const BYTE b256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(b * 255.0f + 0.5f)));
-
-	s_clearColor = RGB(r256, g256, b256);
+	s_clearColor = rgb;
 
 	for (const auto& monitor : s_monitors)
 	{
 		if (!::IsWindowVisible(monitor.hwnd))
 			continue;
-		
+
 		::InvalidateRect(monitor.hwnd, nullptr, FALSE);
 	}
+}
+
+void Dimmer_SetColor(float r, float g, float b)
+{
+	const BYTE r256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(r * 255.0f + 0.5f)));
+	const BYTE g256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(g * 255.0f + 0.5f)));
+	const BYTE b256 = static_cast<BYTE>(std::min(static_cast<DWORD>(255), static_cast<DWORD>(b * 255.0f + 0.5f)));
+	Dimmer_SetColor(RGB(r256, g256, b256));
 }
 
 void Dimmer_Close()

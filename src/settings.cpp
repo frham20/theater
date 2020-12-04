@@ -14,8 +14,11 @@ struct Settings
 	bool dirty = false;
 	bool enabled = true;
 	std::vector<std::wstring> processNames;
+<<<<<<< HEAD
 	BYTE alpha = 200;
 	COLORREF color = RGB(0, 0, 0);
+=======
+>>>>>>> main
 };
 
 static Settings s_settings;
@@ -88,6 +91,7 @@ bool Settings_Load()
 		if (enabledVal.IsBool())
 			s_settings.enabled = enabledVal.GetBool();
 
+<<<<<<< HEAD
 		const auto& alphaVal = doc[L"alpha"];
 		if (alphaVal.IsInt())
 			s_settings.alpha = static_cast<BYTE>(std::max(0, std::min(255, alphaVal.GetInt())));
@@ -109,6 +113,8 @@ bool Settings_Load()
 			s_settings.color = RGB(r, g, b);
 		}
 
+=======
+>>>>>>> main
 		const auto& processes = doc[L"processes"];
 		if (processes.IsArray())
 		{
@@ -145,6 +151,7 @@ bool Settings_Save()
 
 	doc.AddMember(L"version", JSONValue(SETTINGS_VERSION), docAllocator);
 	doc.AddMember(L"enabled", JSONValue(s_settings.enabled), docAllocator);
+<<<<<<< HEAD
 	doc.AddMember(L"alpha", JSONValue(static_cast<int>(s_settings.alpha)), docAllocator);
 
 	JSONValue color(rapidjson::kArrayType);
@@ -153,6 +160,8 @@ bool Settings_Save()
 	color.PushBack(JSONValue(GetGValue(s_settings.color)), docAllocator);
 	color.PushBack(JSONValue(GetBValue(s_settings.color)), docAllocator);
 	doc.AddMember(L"color", color, docAllocator);
+=======
+>>>>>>> main
 
 	JSONValue processNames(rapidjson::kArrayType);
 	processNames.Reserve(static_cast<rapidjson::SizeType>(s_settings.processNames.size()), docAllocator);
@@ -218,6 +227,7 @@ void Settings_RemoveProcessName(const wchar_t* processName)
 
 	s_settings.processNames.erase(iter);
 	s_settings.dirty = true;
+<<<<<<< HEAD
 }
 
 BYTE Settings_GetAlpha()
@@ -228,4 +238,6 @@ BYTE Settings_GetAlpha()
 COLORREF Settings_GetColor()
 {
 	return s_settings.color;
+=======
+>>>>>>> main
 }

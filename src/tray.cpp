@@ -170,5 +170,3 @@ void Tray_Close()
 	Tray_NotificationsUnregister();
 	Tray_MessageWindowDestroy();
 }
-
-#pragma optimize( "", on )

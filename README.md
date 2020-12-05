@@ -6,8 +6,8 @@ Utility to dim all screens when focusing on some applications, especially useful
 
 ## TODO
 - UI: Support adding and removing target processes through a dialog box
-- UI: Support setting the target transparency
+~- UI: Support setting the target transparency~
 - UI: Support customizing the fade in/out animations
-- CONFIG: Add support for YAML or JSON based config files
+~- CONFIG: Add support for YAML or JSON based config files~
 - OPTIM: Cache window handles / process IDs in some ways with their associated process?
-- Add support for custom color
+~- Add support for custom color~

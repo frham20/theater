@@ -22,4 +22,7 @@
   <ItemGroup>
     <Image Include="theater.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
+  </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 #pragma once
 
-//Win32 API
+// Win32 API
 #include <SDKDDKVer.h>
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -11,14 +11,14 @@
 #include <shlobj.h>
 #include <commdlg.h>
 
-//STL
+// STL
 #include <algorithm>
 #include <chrono>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-//App
+// App
 #include "settings.h"
 #include "tray.h"
 #include "app.h"

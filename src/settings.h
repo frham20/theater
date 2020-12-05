@@ -1,18 +1,43 @@
 #pragma once
-bool Settings_Load();
-bool Settings_Save();
-bool Settings_IsTheaterEnabled();
-void Settings_EnableTheater(bool state);
-size_t Settings_GetProcessNamesCount();
-size_t Settings_GetProcessNames(const wchar_t* processNames[], size_t processNamesCount );
-void Settings_AddProcessName(const wchar_t* processName);
-void Settings_RemoveProcessName(const wchar_t* processName);
-BYTE Settings_GetAlpha();
-void Settings_SetAlpha(BYTE alpha);
-COLORREF Settings_GetColor();
-void Settings_SetColor(COLORREF color);
 
-typedef void (*SETTINGSCHANGEDCALLBACK)();
-void Settings_RegisterChangedCallback(SETTINGSCHANGEDCALLBACK callback);
-void Settings_UnregisterChangedCallback(SETTINGSCHANGEDCALLBACK callback);
-void Settings_NotifyChanges();
+namespace Theater
+{
+	class Settings
+	{
+	public:
+		Settings()  = default;
+		~Settings() = default;
+
+		bool Load();
+		bool Save() const;
+
+		bool IsTheaterEnabled() const;
+		void EnableTheater( bool state );
+
+		size_t GetProcessNamesCount() const;
+		size_t GetProcessNames( const wchar_t* processNames[], size_t processNamesCount ) const;
+		void   AddProcessName( const wchar_t* processName );
+		void   RemoveProcessName( const wchar_t* processName );
+
+		BYTE     GetAlpha() const;
+		void     SetAlpha( BYTE alpha );
+		COLORREF GetColor() const;
+		void     SetColor( COLORREF color );
+
+		typedef void ( *SETTINGSCHANGEDCALLBACK )();
+		void RegisterChangedCallback( SETTINGSCHANGEDCALLBACK callback );
+		void UnregisterChangedCallback( SETTINGSCHANGEDCALLBACK callback );
+		void NotifyChanges() const;
+
+	private:
+		mutable bool dirty   = false;
+		bool         enabled = true;
+		BYTE         alpha   = 200;
+		COLORREF     color   = RGB( 0, 0, 0 );
+
+		std::vector<std::wstring> processNames;
+
+		std::vector<SETTINGSCHANGEDCALLBACK> notifyCallbacks;
+	};
+
+} // namespace Theater

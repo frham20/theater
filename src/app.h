@@ -4,7 +4,7 @@ namespace Theater
 {
 	class App
 	{
-	  public:
+	public:
 		App()  = default;
 		~App() = default;
 
@@ -12,9 +12,12 @@ namespace Theater
 		int  Run();
 		void Close();
 
+		Settings& GetSettings();
+		const Settings& GetSettings() const;
+
 		static App& Current();
 
-	  private:
+	private:
 		void TheaterStart( HWND hwnd );
 		void TheaterStop();
 
@@ -33,13 +36,13 @@ namespace Theater
 		void        OnSettingsChanged();
 		static void SettingsChangedCallback();
 
-	  private:
+	private:
 		App( const App& ) = delete;
 		App( App&& )      = delete;
 		App& operator=( const App& ) = delete;
 		App& operator=( App&& ) = delete;
 
-	  private:
+	private:
 		HWND messageWindow = nullptr;
 		bool theaterShown  = false;
 
@@ -50,6 +53,7 @@ namespace Theater
 		std::vector<HWND>                topLevelWindows;
 		std::unordered_set<std::wstring> processNameSet;
 
-		Theater::Tray tray;
+		Tray tray;
+		Settings settings;
 	};
 } // namespace Theater

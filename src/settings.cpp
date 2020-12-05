@@ -7,259 +7,257 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/reader.h>
 
-static constexpr int SETTINGS_VERSION = 1;
-
-struct Settings
+namespace Theater
 {
-	bool                      dirty   = false;
-	bool                      enabled = true;
-	std::vector<std::wstring> processNames;
-	BYTE                      alpha = 200;
-	COLORREF                  color = RGB( 0, 0, 0 );
-};
-
-static Settings                             s_settings;
-static wchar_t                              s_settingsFilename[MAX_PATH]  = L"";
-static wchar_t                              s_settingsDirectory[MAX_PATH] = L"";
-static char                                 s_jsonReadWriteBuffer[1024 * 8];
-static std::vector<SETTINGSCHANGEDCALLBACK> s_notifyCallbacks;
-
-typedef rapidjson::GenericDocument<rapidjson::UTF16<>> JSONDocument;
-typedef rapidjson::GenericValue<rapidjson::UTF16<>>    JSONValue;
-
-static const wchar_t* Settings_GetSettingsDirectory()
-{
-	if ( s_settingsDirectory[0] == 0 )
+	namespace
 	{
-		PWSTR pLocalAppDataPath = nullptr;
-		if ( ::SHGetKnownFolderPath( FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pLocalAppDataPath ) != S_OK )
+		static constexpr int SETTINGS_VERSION = 1;
+
+		typedef rapidjson::GenericDocument<rapidjson::UTF16<>> JSONDocument;
+		typedef rapidjson::GenericValue<rapidjson::UTF16<>>    JSONValue;
+
+		wchar_t s_settingsFilename[MAX_PATH]  = L"";
+		wchar_t s_settingsDirectory[MAX_PATH] = L"";
+		char    s_jsonReadWriteBuffer[1024 * 8];
+
+		const wchar_t* GetSettingsDirectory()
 		{
-			::CoTaskMemFree( pLocalAppDataPath );
+			if ( s_settingsDirectory[0] == 0 )
+			{
+				PWSTR pLocalAppDataPath = nullptr;
+				if ( ::SHGetKnownFolderPath( FOLDERID_LocalAppData, KF_FLAG_DEFAULT, nullptr, &pLocalAppDataPath ) !=
+				     S_OK )
+				{
+					::CoTaskMemFree( pLocalAppDataPath );
+					return s_settingsDirectory;
+				}
+
+				_snwprintf_s( s_settingsDirectory, MAX_PATH, L"%s\\Theater", pLocalAppDataPath );
+				::CoTaskMemFree( pLocalAppDataPath );
+			}
+
 			return s_settingsDirectory;
 		}
 
-		_snwprintf_s( s_settingsDirectory, MAX_PATH, L"%s\\Theater", pLocalAppDataPath );
-		::CoTaskMemFree( pLocalAppDataPath );
-	}
-
-	return s_settingsDirectory;
-}
-
-static const wchar_t* Settings_GetSettingsFilename()
-{
-	if ( s_settingsFilename[0] == 0 )
-	{
-		const auto dir = Settings_GetSettingsDirectory();
-		_snwprintf_s( s_settingsFilename, MAX_PATH, L"%s\\settings.json", dir );
-	}
-
-	return s_settingsFilename;
-}
-
-bool Settings_Load()
-{
-	const auto filename = Settings_GetSettingsFilename();
-	if ( ::GetFileAttributesW( filename ) == INVALID_FILE_ATTRIBUTES )
-		return false;
-
-	FILE* fp = nullptr;
-	_wfopen_s( &fp, filename, L"rb" );
-	if ( fp == nullptr )
-		return false;
-
-	rapidjson::FileReadStream inStream( fp, s_jsonReadWriteBuffer, sizeof( s_jsonReadWriteBuffer ) );
-
-	JSONDocument doc;
-	doc.ParseStream<rapidjson::kParseDefaultFlags, rapidjson::UTF8<>, rapidjson::FileReadStream>( inStream );
-	fclose( fp );
-
-	if ( doc.HasParseError() )
-		return false;
-
-	int         version    = 0;
-	const auto& versionVal = doc[L"version"];
-	if ( versionVal.IsInt() )
-		version = versionVal.GetInt();
-
-	switch ( version )
-	{
-	case SETTINGS_VERSION: {
-		const auto& enabledVal = doc[L"enabled"];
-		if ( enabledVal.IsBool() )
-			s_settings.enabled = enabledVal.GetBool();
-
-		const auto& alphaVal = doc[L"alpha"];
-		if ( alphaVal.IsInt() )
-			s_settings.alpha = static_cast<BYTE>( std::max( 0, std::min( 255, alphaVal.GetInt() ) ) );
-
-		const auto& color = doc[L"color"];
-		if ( color.IsArray() && color.Size() == 3 )
+		const wchar_t* GetSettingsFilename()
 		{
-			BYTE r = 0;
-			BYTE g = 0;
-			BYTE b = 0;
+			if ( s_settingsFilename[0] == 0 )
+			{
+				const auto dir = GetSettingsDirectory();
+				_snwprintf_s( s_settingsFilename, MAX_PATH, L"%s\\settings.json", dir );
+			}
 
-			if ( color[0].IsInt() )
-				r = static_cast<BYTE>( std::max( 0, std::min( 255, color[0].GetInt() ) ) );
-			if ( color[1].IsInt() )
-				g = static_cast<BYTE>( std::max( 0, std::min( 255, color[1].GetInt() ) ) );
-			if ( color[2].IsInt() )
-				b = static_cast<BYTE>( std::max( 0, std::min( 255, color[2].GetInt() ) ) );
+			return s_settingsFilename;
+		}
+	} // namespace
 
-			s_settings.color = RGB( r, g, b );
+	bool Settings::Load()
+	{
+		const auto filename = GetSettingsFilename();
+		if ( ::GetFileAttributesW( filename ) == INVALID_FILE_ATTRIBUTES )
+			return false;
+
+		FILE* fp = nullptr;
+		_wfopen_s( &fp, filename, L"rb" );
+		if ( fp == nullptr )
+			return false;
+
+		rapidjson::FileReadStream inStream( fp, s_jsonReadWriteBuffer, sizeof( s_jsonReadWriteBuffer ) );
+
+		JSONDocument doc;
+		doc.ParseStream<rapidjson::kParseDefaultFlags, rapidjson::UTF8<>, rapidjson::FileReadStream>( inStream );
+		fclose( fp );
+
+		if ( doc.HasParseError() )
+			return false;
+
+		int         version    = 0;
+		const auto& versionVal = doc[L"version"];
+		if ( versionVal.IsInt() )
+			version = versionVal.GetInt();
+
+		switch ( version )
+		{
+		case SETTINGS_VERSION: {
+			const auto& enabledVal = doc[L"enabled"];
+			if ( enabledVal.IsBool() )
+				this->enabled = enabledVal.GetBool();
+
+			const auto& alphaVal = doc[L"alpha"];
+			if ( alphaVal.IsInt() )
+				this->alpha = static_cast<BYTE>( std::max( 0, std::min( 255, alphaVal.GetInt() ) ) );
+
+			const auto& colorVal = doc[L"color"];
+			if ( colorVal.IsArray() && colorVal.Size() == 3 )
+			{
+				BYTE r = 0;
+				BYTE g = 0;
+				BYTE b = 0;
+
+				if ( colorVal[0].IsInt() )
+					r = static_cast<BYTE>( std::max( 0, std::min( 255, colorVal[0].GetInt() ) ) );
+				if ( colorVal[1].IsInt() )
+					g = static_cast<BYTE>( std::max( 0, std::min( 255, colorVal[1].GetInt() ) ) );
+				if ( colorVal[2].IsInt() )
+					b = static_cast<BYTE>( std::max( 0, std::min( 255, colorVal[2].GetInt() ) ) );
+
+				this->color = RGB( r, g, b );
+			}
+
+			const auto& processes = doc[L"processes"];
+			if ( processes.IsArray() )
+			{
+				this->processNames.clear();
+
+				for ( const auto& name : processes.GetArray() )
+					this->processNames.emplace_back( std::wstring( name.GetString() ) );
+			}
+
+			break;
+		}
+		default: {
+			// unsupported version, bail out
+			return false;
+		}
 		}
 
-		const auto& processes = doc[L"processes"];
-		if ( processes.IsArray() )
-		{
-			s_settings.processNames.clear();
+		this->dirty = false;
 
-			for ( const auto& name : processes.GetArray() )
-				s_settings.processNames.emplace_back( std::wstring( name.GetString() ) );
-		}
-
-		break;
-	}
-	default: {
-		// unsupported version, bail out
-		return false;
-	}
-	}
-
-	s_settings.dirty = false;
-
-	return true;
-}
-
-bool Settings_Save()
-{
-	const auto filename = Settings_GetSettingsFilename();
-	if ( ::GetFileAttributesW( filename ) != INVALID_FILE_ATTRIBUTES && !s_settings.dirty )
 		return true;
+	}
 
-	JSONDocument doc;
-	doc.SetObject();
+	bool Settings::Save() const
+	{
+		const auto filename = GetSettingsFilename();
+		if ( ::GetFileAttributesW( filename ) != INVALID_FILE_ATTRIBUTES && !this->dirty )
+			return true;
 
-	auto& docAllocator = doc.GetAllocator();
+		JSONDocument doc;
+		doc.SetObject();
 
-	doc.AddMember( L"version", JSONValue( SETTINGS_VERSION ), docAllocator );
-	doc.AddMember( L"enabled", JSONValue( s_settings.enabled ), docAllocator );
-	doc.AddMember( L"alpha", JSONValue( static_cast<int>( s_settings.alpha ) ), docAllocator );
+		auto& docAllocator = doc.GetAllocator();
 
-	JSONValue color( rapidjson::kArrayType );
-	color.Reserve( 3, docAllocator );
-	color.PushBack( JSONValue( GetRValue( s_settings.color ) ), docAllocator );
-	color.PushBack( JSONValue( GetGValue( s_settings.color ) ), docAllocator );
-	color.PushBack( JSONValue( GetBValue( s_settings.color ) ), docAllocator );
-	doc.AddMember( L"color", color, docAllocator );
+		doc.AddMember( L"version", JSONValue( SETTINGS_VERSION ), docAllocator );
+		doc.AddMember( L"enabled", JSONValue( this->enabled ), docAllocator );
+		doc.AddMember( L"alpha", JSONValue( static_cast<int>( this->alpha ) ), docAllocator );
 
-	JSONValue processNames( rapidjson::kArrayType );
-	processNames.Reserve( static_cast<rapidjson::SizeType>( s_settings.processNames.size() ), docAllocator );
-	for ( const auto& name : s_settings.processNames )
-		processNames.PushBack( JSONValue( rapidjson::StringRef( name.c_str() ) ), docAllocator );
-	doc.AddMember( L"processes", processNames, docAllocator );
+		JSONValue colorVal( rapidjson::kArrayType );
+		colorVal.Reserve( 3, docAllocator );
+		colorVal.PushBack( JSONValue( GetRValue( this->color ) ), docAllocator );
+		colorVal.PushBack( JSONValue( GetGValue( this->color ) ), docAllocator );
+		colorVal.PushBack( JSONValue( GetBValue( this->color ) ), docAllocator );
+		doc.AddMember( L"color", colorVal, docAllocator );
 
-	// make sure the directory exists
-	::SHCreateDirectoryExW( nullptr, Settings_GetSettingsDirectory(), nullptr );
+		JSONValue processNamesVal( rapidjson::kArrayType );
+		processNamesVal.Reserve( static_cast<rapidjson::SizeType>( this->processNames.size() ), docAllocator );
+		for ( const auto& name : this->processNames )
+			processNamesVal.PushBack( JSONValue( rapidjson::StringRef( name.c_str() ) ), docAllocator );
+		doc.AddMember( L"processes", processNamesVal, docAllocator );
 
-	FILE* fp = nullptr;
-	_wfopen_s( &fp, filename, L"wb" );
-	if ( fp == nullptr )
-		return false;
+		// make sure the directory exists
+		::SHCreateDirectoryExW( nullptr, GetSettingsDirectory(), nullptr );
 
-	rapidjson::FileWriteStream outStream( fp, s_jsonReadWriteBuffer, sizeof( s_jsonReadWriteBuffer ) );
-	rapidjson::PrettyWriter<rapidjson::FileWriteStream, rapidjson::UTF16<>, rapidjson::UTF8<>> writer( outStream );
-	const bool success = doc.Accept( writer );
-	fclose( fp );
+		FILE* fp = nullptr;
+		_wfopen_s( &fp, filename, L"wb" );
+		if ( fp == nullptr )
+			return false;
 
-	return success;
-}
+		rapidjson::FileWriteStream outStream( fp, s_jsonReadWriteBuffer, sizeof( s_jsonReadWriteBuffer ) );
+		rapidjson::PrettyWriter<rapidjson::FileWriteStream, rapidjson::UTF16<>, rapidjson::UTF8<>> writer( outStream );
+		const bool success = doc.Accept( writer );
+		fclose( fp );
 
-bool Settings_IsTheaterEnabled()
-{
-	return true;
-}
+		this->dirty = false;
 
-void Settings_EnableTheater( bool state )
-{
-	s_settings.enabled = state;
-	s_settings.dirty   = true;
-}
+		return success;
+	}
 
-size_t Settings_GetProcessNamesCount()
-{
-	return s_settings.processNames.size();
-}
+	bool Settings::IsTheaterEnabled() const
+	{
+		return this->enabled;
+	}
 
-size_t Settings_GetProcessNames( const wchar_t* processNames[], size_t processNamesCount )
-{
-	if ( processNames == nullptr )
-		return 0u;
+	void Settings::EnableTheater( bool state )
+	{
+		this->enabled = state;
+		this->dirty   = true;
+	}
 
-	const size_t maxElements = std::min( processNamesCount, s_settings.processNames.size() );
-	for ( size_t i = 0; i < maxElements; i++ )
-		processNames[i] = s_settings.processNames[i].c_str();
+	size_t Settings::GetProcessNamesCount() const
+	{
+		return this->processNames.size();
+	}
 
-	return maxElements;
-}
+	size_t Settings::GetProcessNames( const wchar_t* processes[], size_t processNamesCount ) const
+	{
+		if ( processes == nullptr )
+			return 0u;
 
-void Settings_AddProcessName( const wchar_t* processName )
-{
-	s_settings.processNames.emplace_back( std::wstring( processName ) );
-	s_settings.dirty = true;
-}
+		const size_t maxElements = std::min( processNamesCount, this->processNames.size() );
+		for ( size_t i = 0; i < maxElements; i++ )
+			processes[i] = this->processNames[i].c_str();
 
-void Settings_RemoveProcessName( const wchar_t* processName )
-{
-	auto iter = std::find_if(
-	    s_settings.processNames.begin(), s_settings.processNames.end(),
-	    [processName]( const std::wstring& name ) { return _wcsicmp( name.c_str(), processName ) == 0; } );
-	if ( iter == s_settings.processNames.end() )
-		return;
+		return maxElements;
+	}
 
-	s_settings.processNames.erase( iter );
-	s_settings.dirty = true;
-}
+	void Settings::AddProcessName( const wchar_t* processName )
+	{
+		this->processNames.emplace_back( std::wstring( processName ) );
+		this->dirty = true;
+	}
 
-BYTE Settings_GetAlpha()
-{
-	return s_settings.alpha;
-}
+	void Settings::RemoveProcessName( const wchar_t* processName )
+	{
+		auto iter = std::find_if(
+		    this->processNames.begin(), this->processNames.end(),
+		    [processName]( const std::wstring& name ) { return _wcsicmp( name.c_str(), processName ) == 0; } );
+		if ( iter == this->processNames.end() )
+			return;
 
-void Settings_SetAlpha( BYTE alpha )
-{
-	s_settings.alpha = alpha;
-	s_settings.dirty = true;
-}
+		this->processNames.erase( iter );
+		this->dirty = true;
+	}
 
-COLORREF Settings_GetColor()
-{
-	return s_settings.color;
-}
+	BYTE Settings::GetAlpha() const
+	{
+		return this->alpha;
+	}
 
-void Settings_SetColor( COLORREF color )
-{
-	s_settings.color = color;
-	s_settings.dirty = true;
-}
+	void Settings::SetAlpha( BYTE value )
+	{
+		this->alpha      = value;
+		this->dirty = true;
+	}
 
-void Settings_RegisterChangedCallback( SETTINGSCHANGEDCALLBACK callback )
-{
-	s_notifyCallbacks.emplace_back( callback );
-}
+	COLORREF Settings::GetColor() const
+	{
+		return this->color;
+	}
 
-void Settings_UnregisterChangedCallback( SETTINGSCHANGEDCALLBACK callback )
-{
-	auto iter = std::find_if( s_notifyCallbacks.begin(), s_notifyCallbacks.end(),
-	                          [callback]( SETTINGSCHANGEDCALLBACK clb ) { return clb == callback; } );
-	if ( iter == s_notifyCallbacks.end() )
-		return;
+	void Settings::SetColor( COLORREF value )
+	{
+		this->color      = value;
+		this->dirty = true;
+	}
 
-	s_notifyCallbacks.erase( iter );
-}
+	void Settings::RegisterChangedCallback( SETTINGSCHANGEDCALLBACK callback )
+	{
+		this->notifyCallbacks.emplace_back( callback );
+	}
 
-void Settings_NotifyChanges()
-{
-	for ( auto callback : s_notifyCallbacks )
-		callback();
-}
+	void Settings::UnregisterChangedCallback( SETTINGSCHANGEDCALLBACK callback )
+	{
+		auto iter = std::find_if( this->notifyCallbacks.begin(), this->notifyCallbacks.end(),
+		                          [callback]( SETTINGSCHANGEDCALLBACK clb ) { return clb == callback; } );
+		if ( iter == this->notifyCallbacks.end() )
+			return;
+
+		this->notifyCallbacks.erase( iter );
+	}
+
+	void Settings::NotifyChanges() const
+	{
+		for ( auto callback : this->notifyCallbacks )
+			callback();
+	}
+} // namespace Theater

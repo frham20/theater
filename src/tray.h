@@ -4,14 +4,14 @@ namespace Theater
 {
 	class Tray
 	{
-	  public:
+	public:
 		Tray() = default;
 		~Tray();
 
 		bool Init();
 		void Close();
 
-	  private:
+	private:
 		Tray( Tray&& )      = delete;
 		Tray( const Tray& ) = delete;
 		Tray& operator=( const Tray& ) = delete;
@@ -25,7 +25,7 @@ namespace Theater
 		LRESULT                 OnMessage( UINT message, WPARAM wParam, LPARAM lParam );
 		static LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-	  private:
+	private:
 		HMENU menu          = nullptr;
 		HMENU contextMenu   = nullptr;
 		HWND  messageWindow = nullptr;

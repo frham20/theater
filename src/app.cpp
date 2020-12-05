@@ -26,6 +26,16 @@ namespace Theater
 		return s_app;
 	}
 
+	Settings& App::GetSettings()
+	{
+		return this->settings;
+	}
+
+	const Settings& App::GetSettings() const
+	{
+		return this->settings;
+	}
+
 	void App::TheaterStart( HWND hwnd )
 	{
 		const bool wasTheaterShown = this->theaterShown;
@@ -80,7 +90,7 @@ namespace Theater
 				this->timerID = 0;
 			}
 
-			const float alpha = ( Settings_GetAlpha() / 255.0f ) * std::min( 1.0f, elapsedMs / 500.0f );
+			const float alpha = ( this->settings.GetAlpha() / 255.0f ) * std::min( 1.0f, elapsedMs / 500.0f );
 			Dimmer_SetAlpha( alpha );
 			break;
 		}
@@ -212,7 +222,7 @@ namespace Theater
 	{
 		// Apply settings
 		const wchar_t* processNames[256] = {};
-		const auto     processNameCount  = Settings_GetProcessNames( processNames, 256 );
+		const auto     processNameCount  = this->settings.GetProcessNames( processNames, 256 );
 
 		this->processNameSet.clear();
 		for ( size_t i = 0; i < processNameCount; i++ )
@@ -223,8 +233,8 @@ namespace Theater
 			this->processNameSet.insert( std::move( name ) );
 		}
 
-		Dimmer_SetAlpha( Settings_GetAlpha() );
-		Dimmer_SetColor( Settings_GetColor() );
+		Dimmer_SetAlpha( this->settings.GetAlpha() );
+		Dimmer_SetColor( this->settings.GetColor() );
 	}
 
 	void App::SettingsChangedCallback()
@@ -234,7 +244,7 @@ namespace Theater
 
 	bool App::Init()
 	{
-		Settings_Load();
+		this->settings.Load();
 
 		if ( !this->tray.Init() )
 			return false;
@@ -248,8 +258,8 @@ namespace Theater
 		if ( !HookRegister() )
 			return false;
 
-		Settings_RegisterChangedCallback( App::SettingsChangedCallback );
-		Settings_NotifyChanges();
+		this->settings.RegisterChangedCallback( App::SettingsChangedCallback );
+		this->settings.NotifyChanges();
 
 		return true;
 	}
@@ -268,8 +278,8 @@ namespace Theater
 
 	void App::Close()
 	{
-		Settings_UnregisterChangedCallback( App::SettingsChangedCallback );
-		Settings_Save();
+		this->settings.UnregisterChangedCallback( App::SettingsChangedCallback );
+		this->settings.Save();
 		HookUnregister();
 		MessageWindowDestroy();
 		Dimmer_Close();

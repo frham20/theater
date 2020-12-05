@@ -179,8 +179,8 @@ namespace Theater
 					break;
 				}
 
-				Settings_SetAlpha( alpha );
-				Settings_NotifyChanges();
+				App::Current().GetSettings().SetAlpha( alpha );
+				App::Current().GetSettings().NotifyChanges();
 				return 0;
 			}
 
@@ -191,12 +191,12 @@ namespace Theater
 				cc.lStructSize  = sizeof( cc );
 				cc.Flags        = CC_RGBINIT | CC_ANYCOLOR | CC_FULLOPEN;
 				cc.lpCustColors = customColors;
-				cc.rgbResult    = Settings_GetColor();
+				cc.rgbResult    = App::Current().GetSettings().GetColor();
 
 				if ( ::ChooseColorW( &cc ) == TRUE )
-					Settings_SetColor( cc.rgbResult );
+					App::Current().GetSettings().SetColor( cc.rgbResult );
 
-				Settings_NotifyChanges();
+				App::Current().GetSettings().NotifyChanges();
 				return 0;
 			}
 			case ID_TRAY_CONTEXT_EXIT: {

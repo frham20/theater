@@ -28,9 +28,51 @@ static LRESULT CALLBACK Tray_WndProc(HWND hWnd, UINT message, WPARAM wParam, LPA
 	{
 		switch (LOWORD(wParam))
 		{
-		case ID_TRAY_CONTEXT_ABOUT:
+		case ID_TRAY_CONTEXT_OPACITY_100:
+		case ID_TRAY_CONTEXT_OPACITY_90:
+		case ID_TRAY_CONTEXT_OPACITY_80:
+		case ID_TRAY_CONTEXT_OPACITY_70:
+		case ID_TRAY_CONTEXT_OPACITY_60:
+		case ID_TRAY_CONTEXT_OPACITY_50:
+		case ID_TRAY_CONTEXT_OPACITY_40:
+		case ID_TRAY_CONTEXT_OPACITY_30:
+		case ID_TRAY_CONTEXT_OPACITY_20:
+		case ID_TRAY_CONTEXT_OPACITY_10:
 		{
-			//DialogBoxW(::GetModuleHandleW(nullptr), MAKEINTRESOURCE(IDD_ABOUTBOX), HWND_DESKTOP, About);
+			BYTE alpha = 255;
+			switch (LOWORD(wParam))
+			{
+			case ID_TRAY_CONTEXT_OPACITY_100: alpha = 255; break;
+			case ID_TRAY_CONTEXT_OPACITY_90: alpha = 230; break;
+			case ID_TRAY_CONTEXT_OPACITY_80: alpha = 204; break;
+			case ID_TRAY_CONTEXT_OPACITY_70: alpha = 179; break;
+			case ID_TRAY_CONTEXT_OPACITY_60: alpha = 153; break;
+			case ID_TRAY_CONTEXT_OPACITY_50: alpha = 128; break;
+			case ID_TRAY_CONTEXT_OPACITY_40: alpha = 102; break;
+			case ID_TRAY_CONTEXT_OPACITY_30: alpha = 77; break;
+			case ID_TRAY_CONTEXT_OPACITY_20: alpha = 51; break;
+			case ID_TRAY_CONTEXT_OPACITY_10: alpha = 26; break;
+			}
+
+			Settings_SetAlpha(alpha);
+			Settings_NotifyChanges();
+			return 0;
+		}
+
+		case ID_TRAY_CONTEXT_COLOR:
+		{
+			static COLORREF customColors[16] = {};
+
+			CHOOSECOLORW cc = {};
+			cc.lStructSize = sizeof(cc);
+			cc.Flags = CC_RGBINIT | CC_ANYCOLOR | CC_FULLOPEN;
+			cc.lpCustColors = customColors;
+			cc.rgbResult = Settings_GetColor();
+
+			if (::ChooseColorW(&cc) == TRUE)
+				Settings_SetColor(cc.rgbResult);
+
+			Settings_NotifyChanges();
 			return 0;
 		}
 		case ID_TRAY_CONTEXT_EXIT:
@@ -170,5 +212,3 @@ void Tray_Close()
 	Tray_NotificationsUnregister();
 	Tray_MessageWindowDestroy();
 }
-
-#pragma optimize( "", on )

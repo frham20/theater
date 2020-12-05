@@ -54,7 +54,23 @@ IDM_TRAY_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
-        MENUITEM "&About...",                   ID_TRAY_CONTEXT_ABOUT, INACTIVE
+        MENUITEM "Enabled",                     ID_TRAY_CONTEXT_ENABLED, CHECKED
+        MENUITEM SEPARATOR
+        POPUP "Opacity"
+        BEGIN
+            MENUITEM "100%",                        ID_TRAY_CONTEXT_OPACITY_100
+            MENUITEM "90%",                         ID_TRAY_CONTEXT_OPACITY_90
+            MENUITEM "80%",                         ID_TRAY_CONTEXT_OPACITY_80
+            MENUITEM "70%",                         ID_TRAY_CONTEXT_OPACITY_70
+            MENUITEM "60%",                         ID_TRAY_CONTEXT_OPACITY_60
+            MENUITEM "50%",                         ID_TRAY_CONTEXT_OPACITY_50
+            MENUITEM "40%",                         ID_TRAY_CONTEXT_OPACITY_40
+            MENUITEM "30%",                         ID_TRAY_CONTEXT_OPACITY_30
+            MENUITEM "20%",                         ID_TRAY_CONTEXT_OPACITY_20
+            MENUITEM "10%",                         ID_TRAY_CONTEXT_OPACITY_10
+        END
+        MENUITEM "Color...",                    ID_TRAY_CONTEXT_COLOR
+        MENUITEM SEPARATOR
         MENUITEM "&Exit",                       ID_TRAY_CONTEXT_EXIT
     END
 END

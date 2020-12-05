@@ -186,6 +186,24 @@ static void App_HookUnregister()
 	::CoUninitialize();
 }
 
+static void App_SettingsChanged()
+{
+	//Apply settings
+	const wchar_t* processNames[256] = {};
+	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
+
+	s_processNameSet.clear();
+	for (size_t i = 0; i < processNameCount; i++)
+	{
+		std::wstring name(processNames[i]);
+		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
+		s_processNameSet.insert(std::move(name));
+	}
+
+	Dimmer_SetAlpha(Settings_GetAlpha());
+	Dimmer_SetColor(Settings_GetColor());
+}
+
 bool App_Init()
 {
 	Settings_Load();
@@ -202,17 +220,8 @@ bool App_Init()
 	if (!App_HookRegister())
 		return false;
 
-	//Apply settings
-	const wchar_t* processNames[256] = {};
-	const auto processNameCount = Settings_GetProcessNames(processNames, 256);
-	for (size_t i = 0; i < processNameCount; i++)
-	{
-		std::wstring name(processNames[i]);
-		std::transform(name.begin(), name.end(), name.begin(), [](wchar_t c) { return static_cast<wchar_t>(std::tolower(c)); });
-		s_processNameSet.insert(std::move(name));
-	}
-
-	Dimmer_SetColor(Settings_GetColor());
+	Settings_RegisterChangedCallback(App_SettingsChanged);
+	Settings_NotifyChanges();
 
 	return true;
 }
@@ -231,8 +240,8 @@ int App_Run()
 
 void App_Close()
 {
+	Settings_UnregisterChangedCallback(App_SettingsChanged);
 	Settings_Save();
-
 	App_HookUnregister();
 	App_MessageWindowDestroy();
 	Dimmer_Close();

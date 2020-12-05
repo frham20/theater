@@ -7,13 +7,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nCmdShow);
 
-	if (!App_Init())
+	auto& app = Theater::App::Current();
+
+	if (!app.Init())
 	{
-		App_Close();
+		app.Close();
 		return -1;
 	}
 
-	const auto result = App_Run();
-	App_Close();
+	const auto result = app.Run();
+	app.Close();
 	return result;
 }

@@ -22,6 +22,7 @@ static Settings s_settings;
 static wchar_t s_settingsFilename[MAX_PATH] = L"";
 static wchar_t s_settingsDirectory[MAX_PATH] = L"";
 static char s_jsonReadWriteBuffer[1024 * 8];
+static std::vector<SETTINGSCHANGEDCALLBACK> s_notifyCallbacks;
 
 typedef rapidjson::GenericDocument<rapidjson::UTF16<> > JSONDocument;
 typedef rapidjson::GenericValue<rapidjson::UTF16<> >    JSONValue;
@@ -225,7 +226,39 @@ BYTE Settings_GetAlpha()
 	return s_settings.alpha;
 }
 
+void Settings_SetAlpha(BYTE alpha)
+{
+	s_settings.alpha = alpha;
+	s_settings.dirty = true;
+}
+
 COLORREF Settings_GetColor()
 {
 	return s_settings.color;
+}
+
+void Settings_SetColor(COLORREF color)
+{
+	s_settings.color = color;
+	s_settings.dirty = true;
+}
+
+void Settings_RegisterChangedCallback(SETTINGSCHANGEDCALLBACK callback)
+{
+	s_notifyCallbacks.emplace_back(callback);
+}
+
+void Settings_UnregisterChangedCallback(SETTINGSCHANGEDCALLBACK callback)
+{
+	auto iter = std::find_if(s_notifyCallbacks.begin(), s_notifyCallbacks.end(), [callback](SETTINGSCHANGEDCALLBACK clb) { return clb == callback; });
+	if (iter == s_notifyCallbacks.end())
+		return;
+
+	s_notifyCallbacks.erase(iter);
+}
+
+void Settings_NotifyChanges()
+{
+	for (auto callback : s_notifyCallbacks)
+		callback();
 }

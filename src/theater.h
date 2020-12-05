@@ -9,6 +9,7 @@
 #include <combaseapi.h>
 #include <shellapi.h>
 #include <shlobj.h>
+#include <commdlg.h>
 
 //STL
 #include <algorithm>

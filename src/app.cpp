@@ -13,6 +13,7 @@ static std::chrono::high_resolution_clock::time_point s_timerStart;
 static std::vector<HWND> s_topLevelWindows;
 static HWINEVENTHOOK s_winEventHook = nullptr;
 static std::unordered_set<std::wstring> s_processNameSet;
+static Theater::Tray s_tray;
 
 
 static BOOL CALLBACK App_EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
@@ -208,7 +209,7 @@ bool App_Init()
 {
 	Settings_Load();
 
-	if (!Tray_Init())
+	if (!s_tray.Init())
 		return false;
 	
 	if (!App_MessageWindowCreate())
@@ -245,5 +246,5 @@ void App_Close()
 	App_HookUnregister();
 	App_MessageWindowDestroy();
 	Dimmer_Close();
-	Tray_Close();
+	s_tray.Close();
 }

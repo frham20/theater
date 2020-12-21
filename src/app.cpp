@@ -45,8 +45,8 @@ namespace Theater
 		{
 			this->timerID    = ::SetTimer( this->messageWindow, this->timerID, 16, nullptr );
 			this->timerStart = std::chrono::high_resolution_clock::now();
-			Dimmer_SetAlpha( 0 );
-			Dimmer_Show( true );
+			this->dimmer.SetAlpha( 0 );
+			this->dimmer.Show( true );
 		}
 
 		this->topLevelWindows.clear();
@@ -59,7 +59,7 @@ namespace Theater
 
 		for ( auto topLevelWnd : this->topLevelWindows )
 		{
-			if ( topLevelWnd == hwnd || Dimmer_IsDimmerWindow( topLevelWnd ) )
+			if ( topLevelWnd == hwnd || this->dimmer.IsDimmerWindow( topLevelWnd ) )
 				continue;
 			::DeferWindowPos( dwp, topLevelWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE );
 		}
@@ -72,7 +72,7 @@ namespace Theater
 		if ( !this->theaterShown )
 			return;
 
-		Dimmer_Show( false );
+		this->dimmer.Show( false );
 		this->theaterShown = false;
 	}
 
@@ -91,7 +91,7 @@ namespace Theater
 			}
 
 			const float alpha = ( this->settings.GetAlpha() / 255.0f ) * std::min( 1.0f, elapsedMs / 500.0f );
-			Dimmer_SetAlpha( alpha );
+			this->dimmer.SetAlpha( alpha );
 			break;
 		}
 		}
@@ -233,8 +233,8 @@ namespace Theater
 			this->processNameSet.insert( std::move( name ) );
 		}
 
-		Dimmer_SetAlpha( this->settings.GetAlpha() );
-		Dimmer_SetColor( this->settings.GetColor() );
+		this->dimmer.SetAlpha( this->settings.GetAlpha() );
+		this->dimmer.SetColor( this->settings.GetColor() );
 	}
 
 	void App::SettingsChangedCallback()
@@ -252,7 +252,7 @@ namespace Theater
 		if ( !MessageWindowCreate() )
 			return false;
 
-		if ( !Dimmer_Init() )
+		if ( !this->dimmer.Init() )
 			return false;
 
 		if ( !HookRegister() )
@@ -282,7 +282,7 @@ namespace Theater
 		this->settings.Save();
 		HookUnregister();
 		MessageWindowDestroy();
-		Dimmer_Close();
+		this->dimmer.Close();
 		this->tray.Close();
 	}
 } // namespace Theater

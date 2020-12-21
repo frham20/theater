@@ -12,7 +12,7 @@ namespace Theater
 		int  Run();
 		void Close();
 
-		Settings& GetSettings();
+		Settings&       GetSettings();
 		const Settings& GetSettings() const;
 
 		static App& Current();
@@ -53,7 +53,8 @@ namespace Theater
 		std::vector<HWND>                topLevelWindows;
 		std::unordered_set<std::wstring> processNameSet;
 
-		Tray tray;
+		Dimmer   dimmer;
+		Tray     tray;
 		Settings settings;
 	};
 } // namespace Theater

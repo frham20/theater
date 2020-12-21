@@ -12,7 +12,7 @@ namespace Theater
 		int  Run();
 		void Close();
 
-		Settings& GetSettings();
+		Settings&       GetSettings();
 		const Settings& GetSettings() const;
 
 		static App& Current();
@@ -20,6 +20,7 @@ namespace Theater
 	private:
 		void TheaterStart( HWND hwnd );
 		void TheaterStop();
+		void TheaterEnable( bool state );
 
 		bool                    MessageWindowCreate();
 		void                    MessageWindowDestroy();
@@ -53,7 +54,8 @@ namespace Theater
 		std::vector<HWND>                topLevelWindows;
 		std::unordered_set<std::wstring> processNameSet;
 
-		Tray tray;
+		Dimmer   dimmer;
+		Tray     tray;
 		Settings settings;
 	};
 } // namespace Theater

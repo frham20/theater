@@ -21,4 +21,5 @@
 // App
 #include "settings.h"
 #include "tray.h"
+#include "dimmer.h"
 #include "app.h"

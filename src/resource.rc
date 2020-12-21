@@ -54,6 +54,8 @@ IDM_TRAY_CONTEXT MENU
 BEGIN
     POPUP "Context"
     BEGIN
+        MENUITEM "THEATER v0.1",                ID_TRAY_CONTEXT_THEATER, GRAYED
+        MENUITEM SEPARATOR
         MENUITEM "Enabled",                     ID_TRAY_CONTEXT_ENABLED, CHECKED
         MENUITEM SEPARATOR
         POPUP "Opacity"

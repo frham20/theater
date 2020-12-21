@@ -190,6 +190,19 @@ namespace Theater
 		}
 	}
 
+	void App::TheaterEnable( bool state )
+	{
+		if ( state )
+		{
+			HookRegister();
+		}
+		else
+		{
+			HookUnregister();
+			TheaterStop();
+		}
+	}
+
 	void App::WinEventHookProc( HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild,
 	                            DWORD idEventThread, DWORD dwmsEventTime )
 	{
@@ -198,13 +211,13 @@ namespace Theater
 
 	bool App::HookRegister()
 	{
-		auto result = ::CoInitializeEx( nullptr, COINIT_MULTITHREADED );
-		if ( result != S_OK && result != S_FALSE )
-			return false;
+		if ( this->winEventHook != nullptr )
+			return true;
 
 		this->winEventHook =
 		    ::SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr, App::WinEventHookProc, 0, 0,
 		                       WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
+
 		return this->winEventHook != nullptr;
 	}
 
@@ -215,7 +228,6 @@ namespace Theater
 			::UnhookWinEvent( this->winEventHook );
 			this->winEventHook = nullptr;
 		}
-		::CoUninitialize();
 	}
 
 	void App::OnSettingsChanged()
@@ -235,6 +247,8 @@ namespace Theater
 
 		this->dimmer.SetAlpha( this->settings.GetAlpha() );
 		this->dimmer.SetColor( this->settings.GetColor() );
+
+		TheaterEnable( this->settings.IsTheaterEnabled() );
 	}
 
 	void App::SettingsChangedCallback()
@@ -244,6 +258,10 @@ namespace Theater
 
 	bool App::Init()
 	{
+		auto result = ::CoInitializeEx( nullptr, COINIT_MULTITHREADED );
+		if ( result != S_OK && result != S_FALSE )
+			return false;
+
 		this->settings.Load();
 
 		if ( !this->tray.Init() )
@@ -284,5 +302,7 @@ namespace Theater
 		MessageWindowDestroy();
 		this->dimmer.Close();
 		this->tray.Close();
+
+		::CoUninitialize();
 	}
 } // namespace Theater

@@ -203,6 +203,10 @@ namespace Theater
 				::PostQuitMessage( 0 );
 				return 0;
 			}
+			case ID_TRAY_CONTEXT_ENABLED: {
+				App::Current().GetSettings().EnableTheater( !App::Current().GetSettings().IsTheaterEnabled() );
+				return 0;
+			}
 			}
 			break;
 		}
@@ -215,6 +219,12 @@ namespace Theater
 					this->menu = ::LoadMenuW( ::GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( IDM_TRAY_CONTEXT ) );
 					this->contextMenu = ::GetSubMenu( this->menu, 0 );
 				}
+
+				MENUITEMINFOW mii = {};
+				mii.cbSize        = sizeof( mii );
+				mii.fMask         = MIIM_STATE;
+				mii.fState        = MFS_ENABLED | ( App::Current().GetSettings().IsTheaterEnabled() ? MFS_CHECKED : MFS_UNCHECKED );
+				::SetMenuItemInfoW( this->contextMenu, ID_TRAY_CONTEXT_ENABLED, FALSE, &mii );
 
 				// needed to ensure context menu gets closed if a use clicks elsewhere when it is open
 				::SetForegroundWindow( this->messageWindow );
@@ -232,7 +242,7 @@ namespace Theater
 		}
 		}
 
-		return DefWindowProc( this->messageWindow, message, wParam, lParam );
+		return ::DefWindowProc( this->messageWindow, message, wParam, lParam );
 	}
 
 	LRESULT CALLBACK Tray::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )

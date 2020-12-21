@@ -20,6 +20,7 @@ namespace Theater
 	private:
 		void TheaterStart( HWND hwnd );
 		void TheaterStop();
+		void TheaterEnable( bool state );
 
 		bool                    MessageWindowCreate();
 		void                    MessageWindowDestroy();

@@ -4,6 +4,13 @@
 //
 #define IDM_TRAY_CONTEXT                101
 #define IDI_THEATER                     102
+#define IDD_SETTINGS                    103
+#define IDC_LIST_EXEC                   1001
+#define IDC_SLIDER_OPACITY              1002
+#define IDC_EDIT_OPACITY                1003
+#define IDC_BUTTON_COLOR                1004
+#define IDC_BUTTON2                     1005
+#define IDC_BUTTON3                     1006
 #define ID_TRAY_CONTEXT_ABOUT           40003
 #define ID_TRAY_CONTEXT_EXIT            40004
 #define ID_CONTEXT_ENABLED              40005
@@ -39,9 +46,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        103
+#define _APS_NEXT_RESOURCE_VALUE        105
 #define _APS_NEXT_COMMAND_VALUE         40033
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

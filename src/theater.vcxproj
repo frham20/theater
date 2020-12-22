@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="dialog.h" />
     <ClInclude Include="dimmer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="settings.h" />
@@ -93,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="dialog.cpp" />
     <ClCompile Include="dimmer.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="theater.cpp" />

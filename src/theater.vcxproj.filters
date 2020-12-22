@@ -7,6 +7,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="dimmer.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="dialog.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tray.cpp" />
@@ -15,6 +16,7 @@
     <ClCompile Include="theater.cpp" />
     <ClCompile Include="dimmer.cpp" />
     <ClCompile Include="settings.cpp" />
+    <ClCompile Include="dialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

@@ -87,6 +87,59 @@ END
 // remains consistent on all systems.
 IDI_THEATER             ICON                    "theater.ico"
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETTINGS DIALOGEX 0, 0, 319, 204
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Theater Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Close",IDCLOSE,264,184,52,16
+    CONTROL         "",IDC_LIST_EXEC,"SysListView32",LVS_REPORT | LVS_EDITLABELS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,48,312,132
+    CONTROL         "",IDC_SLIDER_OPACITY,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,84,17,232,16
+    LTEXT           "Opacity",IDC_STATIC,44,4,36,12
+    EDITTEXT        IDC_EDIT_OPACITY,44,17,36,16,ES_AUTOHSCROLL
+    LTEXT           "Color",IDC_STATIC,4,4,36,12
+    PUSHBUTTON      "Button1",IDC_BUTTON_COLOR,4,17,36,16
+    PUSHBUTTON      "+",IDC_BUTTON2,4,180,20,16
+    PUSHBUTTON      "-",IDC_BUTTON3,24,180,20,16
+    LTEXT           "Executables",IDC_STATIC,4,36,48,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 312
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 197
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SETTINGS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 

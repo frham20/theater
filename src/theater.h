@@ -22,4 +22,5 @@
 #include "settings.h"
 #include "tray.h"
 #include "dimmer.h"
+#include "dialog.h"
 #include "app.h"

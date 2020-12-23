@@ -29,7 +29,28 @@ namespace Theater
 
 	INT_PTR Dialog::ShowModal( HWND parentWnd )
 	{
+		this->isModal = true;
 		return ::DialogBoxParamW( this->instance, MAKEINTRESOURCEW( this->resourceID ), parentWnd, DlgProc, reinterpret_cast<LONG_PTR>(this) );
+	}
+
+	BOOL Dialog::OnInitDialog()
+	{
+		return this->isModal ? TRUE : FALSE;
+	}
+
+	INT_PTR Dialog::OnMessage( UINT message, WPARAM wParam, LPARAM lParam )
+	{
+		UNREFERENCED_PARAMETER( wParam );
+		UNREFERENCED_PARAMETER( lParam );
+
+		switch (message)
+		{
+		case WM_INITDIALOG: {
+			return OnInitDialog();
+		}
+		}
+
+		return FALSE;
 	}
 
 	INT_PTR Dialog::DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )

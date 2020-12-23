@@ -8,21 +8,14 @@ namespace Theater
 	{
 	}
 
+	BOOL DialogSettings::OnInitDialog()
+	{
+		return __super::OnInitDialog();
+	}
+
 	INT_PTR DialogSettings::OnMessage( UINT message, WPARAM wParam, LPARAM lParam )
 	{
-		UNREFERENCED_PARAMETER( wParam );
-		UNREFERENCED_PARAMETER( lParam );
-
-		switch (message)
-		{
-		case WM_INITDIALOG: {
-
-
-			return TRUE;
-		}
-		}
-
-		return 0;
+		return __super::OnMessage(message, wParam, lParam);
 	}
 
 }

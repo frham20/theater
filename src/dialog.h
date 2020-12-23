@@ -14,14 +14,16 @@ namespace Theater
 		Dialog( HINSTANCE instance, int resourceID );
 		~Dialog();
 
-		virtual INT_PTR OnMessage( UINT message, WPARAM wParam, LPARAM lParam ) = 0;
+		virtual BOOL    OnInitDialog();
+		virtual INT_PTR OnMessage( UINT message, WPARAM wParam, LPARAM lParam );
 
 	private:
 		static INT_PTR DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 	private:
-		HINSTANCE instance;
-		int  resourceID;
-		HWND hwnd;
+		HINSTANCE instance   = nullptr;
+		int       resourceID = 0;
+		HWND      hwnd    = nullptr;
+		bool      isModal = false;
 	};
 }

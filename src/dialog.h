@@ -6,6 +6,8 @@ namespace Theater
 	{
 	public:
 		INT_PTR ShowModal( HWND parentWnd );
+		HWND GetHandle() const;
+		static Dialog* FromHandle( HWND hwnd );
 
 	protected:
 		explicit Dialog( int resourceID);

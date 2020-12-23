@@ -199,6 +199,11 @@ namespace Theater
 				App::Current().GetSettings().NotifyChanges();
 				return 0;
 			}
+			case ID_TRAY_CONTEXT_SETTINGS: {
+				DialogSettings dlg;
+				dlg.ShowModal( nullptr );
+				return 0;
+			}
 			case ID_TRAY_CONTEXT_EXIT: {
 				::PostQuitMessage( 0 );
 				return 0;

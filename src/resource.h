@@ -41,13 +41,15 @@
 #define ID_CONTEXT_THEATERV0            40030
 #define ID_CONTEXT_THEATER              40031
 #define ID_TRAY_CONTEXT_THEATER         40032
+#define ID_CONTEXT_SETTINGS             40033
+#define ID_TRAY_CONTEXT_SETTINGS        40034
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        105
-#define _APS_NEXT_COMMAND_VALUE         40033
+#define _APS_NEXT_COMMAND_VALUE         40035
 #define _APS_NEXT_CONTROL_VALUE         1006
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

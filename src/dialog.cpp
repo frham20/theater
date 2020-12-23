@@ -17,6 +17,16 @@ namespace Theater
 	{
 	}
 
+	HWND Dialog::GetHandle() const
+	{
+		return this->hwnd;
+	}
+
+	Dialog* Dialog::FromHandle( HWND hwnd )
+	{
+		return reinterpret_cast<Dialog*>( ::GetWindowLongPtr( hwnd, DWLP_USER ) );
+	}
+
 	INT_PTR Dialog::ShowModal( HWND parentWnd )
 	{
 		return ::DialogBoxParamW( this->instance, MAKEINTRESOURCEW( this->resourceID ), parentWnd, DlgProc, reinterpret_cast<LONG_PTR>(this) );
@@ -24,7 +34,7 @@ namespace Theater
 
 	INT_PTR Dialog::DlgProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 	{
-		auto dialog = reinterpret_cast<Dialog*>(::GetWindowLongPtr( hWnd, DWLP_USER ));
+		auto dialog = Dialog::FromHandle( hWnd );
 		if(dialog != nullptr)
 			return dialog->OnMessage( message, wParam, lParam );
 

@@ -3,6 +3,13 @@
 #include "dimmer.h"
 #include "resource.h"
 
+// Enable visual styles for common controls
+#pragma comment( lib, "Comctl32.lib" )
+#pragma comment( linker, "\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"" )
+
+
 namespace Theater
 {
 	namespace
@@ -260,6 +267,12 @@ namespace Theater
 	{
 		auto result = ::CoInitializeEx( nullptr, COINIT_MULTITHREADED );
 		if ( result != S_OK && result != S_FALSE )
+			return false;
+
+		INITCOMMONCONTROLSEX cctl = {};
+		cctl.dwSize               = sizeof( cctl );
+		cctl.dwICC                = ICC_WIN95_CLASSES;
+		if ( !::InitCommonControlsEx( &cctl ) )
 			return false;
 
 		this->settings.Load();

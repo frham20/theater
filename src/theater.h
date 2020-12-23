@@ -9,6 +9,7 @@
 #include <combaseapi.h>
 #include <shellapi.h>
 #include <shlobj.h>
+#include <CommCtrl.h>
 #include <commdlg.h>
 
 // STL
@@ -20,7 +21,8 @@
 
 // App
 #include "settings.h"
+#include "dialog.h"
+#include "dialogsettings.h"
 #include "tray.h"
 #include "dimmer.h"
-#include "dialog.h"
 #include "app.h"

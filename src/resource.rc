@@ -73,6 +73,8 @@ BEGIN
         END
         MENUITEM "Color...",                    ID_TRAY_CONTEXT_COLOR
         MENUITEM SEPARATOR
+        MENUITEM "&Settings...",                ID_TRAY_CONTEXT_SETTINGS
+        MENUITEM SEPARATOR
         MENUITEM "&Exit",                       ID_TRAY_CONTEXT_EXIT
     END
 END
